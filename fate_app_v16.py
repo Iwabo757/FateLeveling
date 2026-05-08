@@ -922,7 +922,14 @@ def requests():
         📝 {r.get('notes','None')}
 
     </div>
+    
+    <a href='/edit-request/{r["id"]}'
+       class='btn'>
 
+       ✏ Edit
+
+    </a>
+    
     <a href="/approve-request/{r['id']}"
        class='btn'>
 
@@ -1044,14 +1051,189 @@ def deny_request(i):
 
     reqs = load_requests()
 
-    for r in reqs:
+    # delete request completely
+    reqs = [
 
-        if r['id'] == i:
-            r['status'] = 'Denied'
+        r for r in reqs
+
+        if r['id'] != i
+    ]
 
     save_requests(reqs)
 
     return redirect('/requests')
+# ---------- EDIT REQUEST ----------
+@app.route('/edit-request/<int:i>',
+           methods=['GET', 'POST'])
+@login_required
+def edit_request(i):
+
+    if not is_admin():
+        return redirect('/')
+
+    reqs = load_requests()
+
+    req = None
+
+    for r in reqs:
+
+        if r['id'] == i:
+            req = r
+            break
+
+    if not req:
+        return redirect('/requests')
+
+    # ---------- SAVE ----------
+    if request.method == 'POST':
+
+        req['discord'] = request.form.get(
+            'discord'
+        )
+
+        req['ign'] = request.form.get(
+            'ign'
+        )
+
+        req['notes'] = request.form.get(
+            'notes'
+        )
+
+        pokemon = []
+
+        names = request.form.getlist(
+            'pokemon'
+        )
+
+        services = request.form.getlist(
+            'service'
+        )
+
+        current_exp = request.form.getlist(
+            'current_exp'
+        )
+
+        target_exp = request.form.getlist(
+            'target_exp'
+        )
+
+        evs = request.form.getlist(
+            'evs'
+        )
+
+        for x in range(len(names)):
+
+            pokemon.append({
+
+                'pokemon': names[x],
+
+                'service': services[x],
+
+                'current_exp':
+                    current_exp[x],
+
+                'target_exp':
+                    target_exp[x],
+
+                'evs':
+                    evs[x]
+            })
+
+        req['pokemon'] = pokemon
+
+        save_requests(reqs)
+
+        return redirect('/requests')
+
+    # ---------- FORM ----------
+    pokemon_html = ""
+
+    for p in req.get('pokemon', []):
+
+        pokemon_html += f"""
+
+        <div class='pokemon'>
+
+            <div style='width:100%'>
+
+            Pokémon:
+            <input name='pokemon'
+                   value='{p['pokemon']}'>
+
+            Service:
+            <select name='service'>
+
+                <option
+                {'selected' if p['service']=='Leveling' else ''}>
+                Leveling
+                </option>
+
+                <option
+                {'selected' if p['service']=='EV Training' else ''}>
+                EV Training
+                </option>
+
+                <option
+                {'selected' if p['service']=='Leveling + EV' else ''}>
+                Leveling + EV
+                </option>
+
+                <option
+                {'selected' if p['service']=='Custom' else ''}>
+                Custom
+                </option>
+
+            </select>
+
+            Current EXP:
+            <input name='current_exp'
+                   value='{p['current_exp']}'>
+
+            Target EXP:
+            <input name='target_exp'
+                   value='{p['target_exp']}'>
+
+            EV Spread:
+            <input name='evs'
+                   value='{p['evs']}'>
+
+            </div>
+
+        </div>
+        """
+
+    return layout(f"""
+
+    <h2>
+    ✏ Edit Request
+    </h2>
+
+    <form method='post'>
+
+        Discord:
+        <input name='discord'
+               value='{req['discord']}'>
+
+        IGN:
+        <input name='ign'
+               value='{req['ign']}'>
+
+        {pokemon_html}
+
+        Notes:
+
+        <textarea name='notes'>
+        {req.get('notes','')}
+        </textarea>
+
+        <button class='btn'>
+
+            💾 Save Changes
+
+        </button>
+
+    </form>
+    """)
 
 # ---------- PAY ----------
 @app.route('/pay/<int:i>')
