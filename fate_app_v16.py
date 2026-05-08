@@ -213,6 +213,27 @@ def layout(content):
 
     # ---------- FULL PAGE ----------
     return f"""
+   
+    <head>
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon"
+        href="/static/icon.png">
+
+    <meta name="apple-mobile-web-app-capable"
+        content="yes">
+
+    <meta name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent">
+
+    <meta name="apple-mobile-web-app-title"
+        content="Fate Services">
+
+    <title>Fate Services</title>
+
+    </head>
 
     <style>
 
