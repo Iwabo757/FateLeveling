@@ -1,0 +1,19 @@
+
+# Install Requirements
+
+```bash
+pip install flask flask-login werkzeug matplotlib
+```
+
+# Default Admin Login
+
+```text
+Username: admin
+Password: fate123
+```
+
+# Build EXE
+
+```bash
+python -m PyInstaller --onefile --noconsole --hidden-import=matplotlib --hidden-import=matplotlib.pyplot fate_app_v16.py
+```

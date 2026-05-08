@@ -1,0 +1,1 @@
+web: gunicorn fate_app_v16:app

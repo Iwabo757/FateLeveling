@@ -1,0 +1,283 @@
+{
+    "orders": [
+        {
+            "id": 2,
+            "client": "DOCPandaX",
+            "pokemon": [
+                {
+                    "name": "Shroomish",
+                    "type": "leveling",
+                    "start": 0,
+                    "end": 1640000,
+                    "price": 164000,
+                    "ev_type": ""
+                },
+                {
+                    "name": "Metagross",
+                    "type": "leveling",
+                    "start": 84155,
+                    "end": 1250000,
+                    "ev_type": "Standard EV",
+                    "price": 116584
+                },
+                {
+                    "name": "Skarmory",
+                    "type": "leveling",
+                    "start": 54257,
+                    "end": 1250000,
+                    "ev_type": "Standard EV",
+                    "price": 119574
+                },
+                {
+                    "name": "Gabite",
+                    "type": "leveling",
+                    "start": 56298,
+                    "end": 1250000,
+                    "ev_type": "Standard EV",
+                    "price": 119370
+                },
+                {
+                    "name": "Gligar",
+                    "type": "leveling",
+                    "start": 30780,
+                    "end": 1059860,
+                    "ev_type": "Standard EV",
+                    "price": 102908
+                },
+                {
+                    "name": "Staraptor",
+                    "type": "leveling",
+                    "start": 60446,
+                    "end": 1059860,
+                    "ev_type": "Standard EV",
+                    "price": 99941
+                }
+            ],
+            "total": 722377,
+            "done": true,
+            "paid": true,
+            "date": "2026-05-01",
+            "categories": {
+                "leveling": 722377,
+                "ev": 0
+            },
+            "completed": true,
+            "start_date": "2026-04-30",
+            "completion_date": "2026-05-01"
+        },
+        {
+            "id": 1,
+            "client": "jasontheboo",
+            "pokemon": [
+                {
+                    "name": "Samurott",
+                    "type": "leveling",
+                    "start": 0,
+                    "end": 1059860,
+                    "ev_type": "Standard EV",
+                    "price": 105986
+                },
+                {
+                    "name": "Claydol",
+                    "type": "leveling",
+                    "start": 0,
+                    "end": 1000000,
+                    "ev_type": "Standard EV",
+                    "price": 100000
+                },
+                {
+                    "name": "Ferrothorn",
+                    "type": "leveling",
+                    "start": 0,
+                    "end": 1000000,
+                    "ev_type": "Standard EV",
+                    "price": 100000
+                },
+                {
+                    "name": "Medicham",
+                    "type": "leveling",
+                    "start": 0,
+                    "end": 1000000,
+                    "ev_type": "Standard EV",
+                    "price": 100000
+                },
+                {
+                    "name": "Samurott (EVs)",
+                    "type": "ev",
+                    "start": 0,
+                    "end": 0,
+                    "ev_type": "Standard EV",
+                    "price": 12000
+                },
+                {
+                    "name": "Medicham (EVs)",
+                    "type": "ev",
+                    "start": 0,
+                    "end": 0,
+                    "ev_type": "Standard EV",
+                    "price": 12000
+                },
+                {
+                    "name": "Claydol (EVs)",
+                    "type": "ev",
+                    "start": 0,
+                    "end": 0,
+                    "ev_type": "Standard EV",
+                    "price": 15000
+                },
+                {
+                    "name": "Ferrothorn (EVs)",
+                    "type": "ev",
+                    "start": 0,
+                    "end": 0,
+                    "ev_type": "Standard EV",
+                    "price": 15000
+                }
+            ],
+            "total": 459986,
+            "done": false,
+            "paid": true,
+            "date": "2026-01-01",
+            "categories": {
+                "leveling": 405986,
+                "ev": 54000
+            },
+            "completed": true,
+            "start_date": "2026-04-19",
+            "completion_date": "2026-04-20"
+        },
+        {
+            "id": 3,
+            "client": "niconti",
+            "pokemon": [
+                {
+                    "name": "meowth",
+                    "price": 96649,
+                    "type": "leveling",
+                    "start": 33509,
+                    "end": 1000000,
+                    "ev_type": ""
+                },
+                {
+                    "name": "meowth",
+                    "price": 6000,
+                    "type": "ev",
+                    "start": 0,
+                    "end": 0,
+                    "ev_type": ""
+                }
+            ],
+            "paid": true,
+            "date": "2026-05-05",
+            "total": 102649,
+            "completed": true,
+            "start_date": "2026-05-02",
+            "completion_date": "2026-05-03"
+        },
+        {
+            "id": 4,
+            "client": "WetWilleh",
+            "pokemon": [
+                {
+                    "name": "Hypno",
+                    "price": 100000,
+                    "type": "leveling",
+                    "ev_type": "",
+                    "start": 0,
+                    "end": 1000000
+                },
+                {
+                    "name": "Hypno",
+                    "price": 12000,
+                    "type": "ev",
+                    "ev_type": "Standard EV",
+                    "start": 0,
+                    "end": 0
+                },
+                {
+                    "name": "Nidoking",
+                    "price": 105900,
+                    "type": "leveling",
+                    "ev_type": "",
+                    "start": 0,
+                    "end": 1059000
+                },
+                {
+                    "name": "NidoKing",
+                    "price": 12000,
+                    "type": "ev",
+                    "ev_type": "Standard EV",
+                    "start": 0,
+                    "end": 0
+                },
+                {
+                    "name": "Reuniclus",
+                    "price": 105900,
+                    "type": "leveling",
+                    "ev_type": "",
+                    "start": 0,
+                    "end": 1059000
+                },
+                {
+                    "name": "Reuniclus",
+                    "price": 12000,
+                    "type": "ev",
+                    "ev_type": "Standard EV",
+                    "start": 0,
+                    "end": 0
+                }
+            ],
+            "total": 347800,
+            "paid": true,
+            "date": "2026-05-05",
+            "completed": true,
+            "start_date": "2026-05-05",
+            "completion_date": "2026-05-07"
+        },
+        {
+            "id": 5,
+            "client": "SevzLight",
+            "pokemon": [
+                {
+                    "name": "Toxicroak",
+                    "price": 94520,
+                    "type": "leveling",
+                    "ev_type": "",
+                    "start": 54797,
+                    "end": 1000000
+                },
+                {
+                    "name": "Staraptor",
+                    "price": 102265,
+                    "type": "leveling",
+                    "ev_type": "",
+                    "start": 37204,
+                    "end": 1059860
+                },
+                {
+                    "name": "Gabite",
+                    "price": 122562,
+                    "type": "leveling",
+                    "ev_type": "",
+                    "start": 24379,
+                    "end": 1250000
+                },
+                {
+                    "name": "Skarmory",
+                    "price": 123179,
+                    "type": "leveling",
+                    "ev_type": "",
+                    "start": 18207,
+                    "end": 1250000
+                }
+            ],
+            "total": 442526,
+            "paid": true,
+            "date": "2026-05-05",
+            "completed": true,
+            "start_date": "2026-05-05",
+            "completion_date": "2026-05-07"
+        }
+    ],
+    "counter": 6
+}
