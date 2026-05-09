@@ -838,163 +838,141 @@ def import_order():
 
         pokemon = []
 
-        current_name = None
-        current_exp = 0
-        target_exp = 0
-        evs = "None"
+        current = None
 
         total = 0
 
-        for line in lines:
+        for raw in lines:
 
-            line = line.strip()
+            line = raw.strip()
 
-            # ---------- POKEMON ----------
+            if not line:
+                continue
+
+            # ---------- SKIP HEADERS ----------
             if (
-                '(' in line
-                and 'xp' in line.lower()
+                'Fate Services' in line
+                or 'Overall Progress' in line
+                or 'TOTAL:' in line
+                or 'Thank you' in line
+                or '━━━━━━━━' in line
+            ):
+                continue
+
+            # ---------- POKEMON NAME ----------
+            if (
+                '🧮' not in line
+                and '💰' not in line
+                and 'EV Training' not in line
+                and '⬜' not in line
+                and 'Complete' not in line
+                and '→' not in line
+                and len(line) < 30
             ):
 
                 # save previous
-                if current_name:
+                if current:
 
-                    gain = (
-                        target_exp
-                        - current_exp
+                    pokemon.append(current)
+
+                    total += current['price']
+
+                current = {
+
+                    'name': line,
+
+                    'start': 0,
+
+                    'end': 0,
+
+                    'ev_type': 'None',
+
+                    'price': 0
+                }
+
+            # ---------- LEVELING ----------
+            elif '→' in line and current:
+
+                try:
+
+                    parts = line.split('→')
+
+                    start = int(
+                        parts[0]
+                        .replace(',', '')
+                        .strip()
                     )
 
-                    price = max(
-                        0,
-                        gain // 10
+                    end = int(
+                        parts[1]
+                        .split('(')[0]
+                        .replace(',', '')
+                        .strip()
                     )
 
-                    if evs != "None":
-                        price += 12000
+                    current['start'] = start
+                    current['end'] = end
 
-                    total += price
+                except:
+                    pass
 
-                    pokemon.append({
+            # ---------- STANDARD EV ----------
+            elif 'Standard EV Training' in line and current:
 
-                        'name':
-                            current_name,
+                current['ev_type'] = 'Standard'
 
-                        'start':
-                            current_exp,
+            # ---------- CUSTOM EV ----------
+            elif 'Custom EV Training' in line and current:
 
-                        'end':
-                            target_exp,
+                current['ev_type'] = 'Custom'
 
-                        'ev_type':
-                            evs,
-
-                        'price':
-                            price
-                    })
-
-                # reset
-                evs = "None"
-
-                # parse name
-                current_name = (
-                    line.split('(')[0]
-                    .strip()
-                    .replace('*','')
-                )
-
-                xp_text = (
-                    line.split('(')[1]
-                    .split(')')[0]
-                    .lower()
-                )
-
-                # parse xp
-                if '1m' in xp_text:
-                    target_exp = 1000000
-
-                elif '1.059' in xp_text:
-                    target_exp = 1059860
-
-                elif '1.25' in xp_text:
-                    target_exp = 1250000
-
-                else:
-                    target_exp = 1000000
-
-                current_exp = 0
-
-            # ---------- EVS ----------
+            # ---------- FINAL PRICE ----------
             elif (
-                '252' in line
-                or 'hp' in line.lower()
+                line.startswith('💰')
+                and 'TOTAL' not in line
+                and current
             ):
 
-                evs = (
-                    line.replace('-','')
-                    .strip()
-                )
+                try:
 
-        # ---------- FINAL SAVE ----------
-        if current_name:
+                    price = int(
 
-            gain = (
-                target_exp
-                - current_exp
-            )
+                        line.replace('💰', '')
+                        .replace('¥', '')
+                        .replace(',', '')
+                        .strip()
+                    )
 
-            price = max(
-                0,
-                gain // 10
-            )
+                    current['price'] = price
 
-            if evs != "None":
-                price += 12000
+                except:
+                    pass
 
-            total += price
+        # ---------- SAVE FINAL ----------
+        if current:
 
-            pokemon.append({
+            pokemon.append(current)
 
-                'name':
-                    current_name,
-
-                'start':
-                    current_exp,
-
-                'end':
-                    target_exp,
-
-                'ev_type':
-                    evs,
-
-                'price':
-                    price
-            })
+            total += current['price']
 
         # ---------- CREATE ORDER ----------
         data['orders'].append({
 
-            'id':
-                data['counter'],
+            'id': data['counter'],
 
-            'client':
-                request.form.get('client'),
+            'client': request.form.get('client'),
 
-            'pokemon':
-                pokemon,
+            'pokemon': pokemon,
 
-            'total':
-                total,
+            'total': total,
 
-            'paid':
-                False,
+            'paid': False,
 
-            'completed':
-                False,
+            'completed': False,
 
-            'start_date':
-                datetime.now().strftime('%Y-%m-%d'),
+            'start_date': datetime.now().strftime('%Y-%m-%d'),
 
-            'completion_date':
-                ''
+            'completion_date': ''
         })
 
         data['counter'] += 1
@@ -1015,11 +993,11 @@ def import_order():
 
         <input name='client'>
 
-        Discord Work Order:
+        Paste Discord Work Order:
 
         <textarea
             name='text'
-            rows='20'></textarea>
+            rows='25'></textarea>
 
         <button class='btn'>
 
