@@ -565,56 +565,24 @@ def current():
             </div>
         """
 
-        # ---------- POKEMON ----------
-        for p in o.get("pokemon", []):
+# ---------- POKEMON ----------
+for p in o.get("pokemon", []):
 
-            start = p.get("start", 0)
+    start = p.get("start", 0)
 
-            end = p.get("end", 0)
+    end = p.get("end", 0)
 
-            gain = end - start
+    gain = end - start
 
-html += f"""
+    level_cost = max(
+        0,
+        gain // 10
+    )
 
-<div class='pokemon'>
-
-    <img src='{sprite(p['name'])}'>
-
-    <div>
-
-        <b>{p['name']}</b><br>
-
-        🧮
-        {start:,}
-        →
-        {end:,}
-
-        (+{gain:,})<br>
-
-"""
-
-# ---------- LEVELING COST ----------
-level_cost = max(
-    0,
-    gain // 10
-)
-
-if level_cost > 0:
-
-    html += f"""
-
-    📈 Leveling Cost:
-    {level_cost:,}¥<br>
-
-    """
-
-# ---------- EV COST ----------
-ev_type = p.get(
-    'ev_type',
-    'None'
-)
-
-if ev_type != 'None':
+    ev_type = p.get(
+        'ev_type',
+        'None'
+    )
 
     ev_cost = (
         p.get('price',0)
@@ -623,21 +591,53 @@ if ev_type != 'None':
 
     html += f"""
 
-    ⚡ {ev_type}:
-    {ev_cost:,}¥<br>
+    <div class='pokemon'>
+
+        <img src='{sprite(p['name'])}'>
+
+        <div>
+
+            <b>{p['name']}</b><br>
+
+            🧮
+            {start:,}
+            →
+            {end:,}
+
+            (+{gain:,})<br>
 
     """
 
-# ---------- TOTAL ----------
-html += f"""
+    # ---------- LEVEL COST ----------
+    if level_cost > 0:
 
-        💰
-        {p.get('price',0):,}¥
+        html += f"""
+
+        📈 Leveling Cost:
+        {level_cost:,}¥<br>
+
+        """
+
+    # ---------- EV COST ----------
+    if ev_type != 'None':
+
+        html += f"""
+
+        ⚡ {ev_type} EV:
+        {ev_cost:,}¥<br>
+
+        """
+
+    # ---------- TOTAL ----------
+    html += f"""
+
+            💰
+            {p.get('price',0):,}¥
+
+        </div>
 
     </div>
-
-</div>
-"""
+    """
 
         # ---------- ADMIN BUTTONS ----------
         if is_admin():
