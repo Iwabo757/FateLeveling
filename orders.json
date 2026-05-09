@@ -277,7 +277,45 @@
             "completed": true,
             "start_date": "2026-05-05",
             "completion_date": "2026-05-07"
+        },
+        {
+            "id": 7,
+            "client": "yiesumsin",
+            "pokemon": [
+                {
+                    "name": "Remoraid",
+                    "start": 0,
+                    "end": 1000000,
+                    "ev_type": "Standard EV",
+                    "level_cost": 100000,
+                    "ev_cost": 12000,
+                    "price": 112000
+                },
+                {
+                    "name": "Horsea",
+                    "start": 0,
+                    "end": 1000000,
+                    "ev_type": "Custom EV",
+                    "level_cost": 100000,
+                    "ev_cost": 15000,
+                    "price": 115000
+                },
+                {
+                    "name": "Drilbur",
+                    "start": 0,
+                    "end": 1000000,
+                    "ev_type": "Standard EV",
+                    "level_cost": 100000,
+                    "ev_cost": 12000,
+                    "price": 112000
+                }
+            ],
+            "total": 339000,
+            "paid": false,
+            "completed": false,
+            "start_date": "2026-05-09",
+            "completion_date": ""
         }
     ],
-    "counter": 6
+    "counter": 8
 }

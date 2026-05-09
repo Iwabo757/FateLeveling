@@ -503,7 +503,6 @@ def current():
             else "⏳ In Progress"
         )
 
-        # ---------- HEADER ----------
         html += f"""
 
         <div class='card'
@@ -566,79 +565,79 @@ def current():
             </div>
         """
 
-# ---------- POKEMON ----------
-for p in o.get("pokemon", []):
+        # ---------- POKEMON ----------
+        for p in o.get("pokemon", []):
 
-    start = p.get("start", 0)
+            start = p.get("start", 0)
 
-    end = p.get("end", 0)
+            end = p.get("end", 0)
 
-    gain = end - start
+            gain = end - start
 
-    level_cost = p.get(
-    'level_cost',
-    max(0, gain // 10)
-)
+            level_cost = p.get(
+                'level_cost',
+                max(0, gain // 10)
+            )
 
-    ev_type = p.get(
-        'ev_type',
-        'None'
-    )
+            ev_type = p.get(
+                'ev_type',
+                'None'
+            )
 
-    ev_cost = p.get(
-    'ev_cost',
-    0
-)
+            ev_cost = p.get(
+                'ev_cost',
+                0
+            )
 
-    html += f"""
+            html += f"""
 
-    <div class='pokemon'>
+            <div class='pokemon'>
 
-        <img src='{sprite(p['name'])}'>
+                <img src='{sprite(p['name'])}'>
 
-        <div>
+                <div>
 
-            <b>{p['name']}</b><br>
+                    <b>{p['name']}</b><br>
 
-            🧮
-            {start:,}
-            →
-            {end:,}
+                    🧮
+                    {start:,}
+                    →
+                    {end:,}
 
-            (+{gain:,})<br>
+                    (+{gain:,})<br>
 
-    """
+            """
 
-    # ---------- LEVEL COST ----------
-    if level_cost > 0:
+            # ---------- LEVEL COST ----------
+            if level_cost > 0:
 
-        html += f"""
+                html += f"""
 
-        📈 Leveling Cost:
-        {level_cost:,}¥<br>
+                📈 Leveling Cost:
+                {level_cost:,}¥<br>
 
-        """
+                """
 
-    # ---------- EV COST ----------
-    if ev_type != 'None':
+            # ---------- EV COST ----------
+            if ev_type != 'None':
 
-        html += f"""
+                html += f"""
 
-        ⚡ {ev_type} EV:
-        {ev_cost:,}¥<br>
+                ⚡ {ev_type}:
+                {ev_cost:,}¥<br>
 
-        """
+                """
 
-    # ---------- TOTAL ----------
-    html += f"""
+            # ---------- TOTAL ----------
+            html += f"""
 
-            💰
-            {p.get('price',0):,}¥
+                    💰
+                    {p.get('price',0):,}¥
 
-        </div>
+                </div>
 
-    </div>
-    """
+            </div>
+            """
 
         # ---------- ADMIN BUTTONS ----------
         if is_admin():
@@ -888,7 +887,7 @@ def import_order():
             if not line:
                 continue
 
-            # ---------- SKIP HEADERS ----------
+            # ---------- SKIP ----------
             if (
                 'Fate Services' in line
                 or 'Overall Progress' in line
@@ -902,14 +901,15 @@ def import_order():
             if (
                 '🧮' not in line
                 and '💰' not in line
+                and 'Leveling Cost' not in line
                 and 'EV Training' not in line
                 and '⬜' not in line
-                and 'Complete' not in line
+                and '🟩' not in line
                 and '→' not in line
                 and len(line) < 30
             ):
 
-                # save previous
+                # save previous pokemon
                 if current:
 
                     pokemon.append(current)
@@ -918,22 +918,22 @@ def import_order():
 
                 current = {
 
-    'name': line,
+                    'name': line,
 
-    'start': 0,
+                    'start': 0,
 
-    'end': 0,
+                    'end': 0,
 
-    'ev_type': 'None',
+                    'ev_type': 'None',
 
-    'level_cost': 0,
+                    'level_cost': 0,
 
-    'ev_cost': 0,
+                    'ev_cost': 0,
 
-    'price': 0
-}
+                    'price': 0
+                }
 
-            # ---------- LEVELING ----------
+            # ---------- EXP ----------
             elif '→' in line and current:
 
                 try:
@@ -954,100 +954,90 @@ def import_order():
                     )
 
                     current['start'] = start
+
                     current['end'] = end
 
                 except:
                     pass
 
-            # ---------- STANDARD EV ----------
-            elif 'Standard EV Training' in line and current:
+            # ---------- LEVELING COST ----------
+            elif (
+                'Leveling Cost:' in line
+                and current
+            ):
 
-                current['ev_type'] = 'Standard'
+                try:
+
+                    lvl_price = int(
+
+                        line.split(':')[1]
+
+                        .replace('¥', '')
+
+                        .replace(',', '')
+
+                        .strip()
+                    )
+
+                    current['level_cost'] = lvl_price
+
+                    current['price'] += lvl_price
+
+                except:
+                    pass
+
+            # ---------- STANDARD EV ----------
+            elif (
+                'Standard EV Training:' in line
+                and current
+            ):
+
+                current['ev_type'] = 'Standard EV'
+
+                try:
+
+                    ev_price = int(
+
+                        line.split(':')[1]
+
+                        .replace('¥', '')
+
+                        .replace(',', '')
+
+                        .strip()
+                    )
+
+                    current['ev_cost'] = ev_price
+
+                    current['price'] += ev_price
+
+                except:
+                    pass
 
             # ---------- CUSTOM EV ----------
-            elif 'Custom EV Training' in line and current:
+            elif (
+                'Custom EV Training:' in line
+                and current
+            ):
 
-                current['ev_type'] = 'Custom'
+                current['ev_type'] = 'Custom EV'
 
-            # ---------- LEVELING COST ----------
-elif (
-    'Leveling Cost:' in line
-    and current
-):
+                try:
 
-    try:
+                    ev_price = int(
 
-        lvl_price = int(
+                        line.split(':')[1]
 
-            line.split(':')[1]
+                        .replace('¥', '')
 
-            .replace('¥','')
+                        .replace(',', '')
 
-            .replace(',','')
+                        .strip()
+                    )
 
-            .strip()
-        )
+                    current['ev_cost'] = ev_price
 
-        current['level_cost'] = lvl_price
-
-        current['price'] += lvl_price
-
-    except:
-        pass
-
-# ---------- STANDARD EV ----------
-elif (
-    'Standard EV Training:' in line
-    and current
-):
-
-    current['ev_type'] = 'Standard EV'
-
-    try:
-
-        ev_price = int(
-
-            line.split(':')[1]
-
-            .replace('¥','')
-
-            .replace(',','')
-
-            .strip()
-        )
-
-        current['ev_cost'] = ev_price
-
-        current['price'] += ev_price
-
-    except:
-        pass
-
-# ---------- CUSTOM EV ----------
-elif (
-    'Custom EV Training:' in line
-    and current
-):
-
-    current['ev_type'] = 'Custom EV'
-
-    try:
-
-        ev_price = int(
-
-            line.split(':')[1]
-
-            .replace('¥','')
-
-            .replace(',','')
-
-            .strip()
-        )
-
-        current['price'] += ev_price
-
-    except:
-        pass
+                    current['price'] += ev_price
 
                 except:
                     pass
