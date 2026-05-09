@@ -458,6 +458,7 @@ def home():
     """
 
     return layout(html)
+
 # ---------- ORDERS ----------
 @app.route('/current')
 @login_required
@@ -574,20 +575,20 @@ for p in o.get("pokemon", []):
 
     gain = end - start
 
-    level_cost = max(
-        0,
-        gain // 10
-    )
+    level_cost = p.get(
+    'level_cost',
+    max(0, gain // 10)
+)
 
     ev_type = p.get(
         'ev_type',
         'None'
     )
 
-    ev_cost = (
-        p.get('price',0)
-        - level_cost
-    )
+    ev_cost = p.get(
+    'ev_cost',
+    0
+)
 
     html += f"""
 
@@ -917,16 +918,20 @@ def import_order():
 
                 current = {
 
-                    'name': line,
+    'name': line,
 
-                    'start': 0,
+    'start': 0,
 
-                    'end': 0,
+    'end': 0,
 
-                    'ev_type': 'None',
+    'ev_type': 'None',
 
-                    'price': 0
-                }
+    'level_cost': 0,
+
+    'ev_cost': 0,
+
+    'price': 0
+}
 
             # ---------- LEVELING ----------
             elif '→' in line and current:
@@ -983,6 +988,8 @@ elif (
             .strip()
         )
 
+        current['level_cost'] = lvl_price
+
         current['price'] += lvl_price
 
     except:
@@ -1008,6 +1015,8 @@ elif (
 
             .strip()
         )
+
+        current['ev_cost'] = ev_price
 
         current['price'] += ev_price
 
