@@ -574,33 +574,70 @@ def current():
 
             gain = end - start
 
-            html += f"""
+html += f"""
 
-            <div class='pokemon'>
+<div class='pokemon'>
 
-                <img src='{sprite(p['name'])}'>
+    <img src='{sprite(p['name'])}'>
 
-                <div>
+    <div>
 
-                    <b>{p['name']}</b><br>
+        <b>{p['name']}</b><br>
 
-                    🧮
-                    {start:,}
-                    →
-                    {end:,}
+        🧮
+        {start:,}
+        →
+        {end:,}
 
-                    (+{gain:,})<br>
+        (+{gain:,})<br>
 
-                    ⚡
-                    {p.get('ev_type','None')}<br>
+"""
 
-                    💰
-                    {p.get('price',0):,}¥
+# ---------- LEVELING COST ----------
+level_cost = max(
+    0,
+    gain // 10
+)
 
-                </div>
+if level_cost > 0:
 
-            </div>
-            """
+    html += f"""
+
+    📈 Leveling Cost:
+    {level_cost:,}¥<br>
+
+    """
+
+# ---------- EV COST ----------
+ev_type = p.get(
+    'ev_type',
+    'None'
+)
+
+if ev_type != 'None':
+
+    ev_cost = (
+        p.get('price',0)
+        - level_cost
+    )
+
+    html += f"""
+
+    ⚡ {ev_type}:
+    {ev_cost:,}¥<br>
+
+    """
+
+# ---------- TOTAL ----------
+html += f"""
+
+        💰
+        {p.get('price',0):,}¥
+
+    </div>
+
+</div>
+"""
 
         # ---------- ADMIN BUTTONS ----------
         if is_admin():
@@ -670,6 +707,7 @@ def current():
     """
 
     return layout(html)
+
 # ---------- ADD ORDER ----------
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
@@ -926,24 +964,81 @@ def import_order():
 
                 current['ev_type'] = 'Custom'
 
-            # ---------- FINAL PRICE ----------
-            elif (
-                line.startswith('💰')
-                and 'TOTAL' not in line
-                and current
-            ):
+            # ---------- LEVELING COST ----------
+elif (
+    'Leveling Cost:' in line
+    and current
+):
 
-                try:
+    try:
 
-                    price = int(
+        lvl_price = int(
 
-                        line.replace('💰', '')
-                        .replace('¥', '')
-                        .replace(',', '')
-                        .strip()
-                    )
+            line.split(':')[1]
 
-                    current['price'] = price
+            .replace('¥','')
+
+            .replace(',','')
+
+            .strip()
+        )
+
+        current['price'] += lvl_price
+
+    except:
+        pass
+
+# ---------- STANDARD EV ----------
+elif (
+    'Standard EV Training:' in line
+    and current
+):
+
+    current['ev_type'] = 'Standard EV'
+
+    try:
+
+        ev_price = int(
+
+            line.split(':')[1]
+
+            .replace('¥','')
+
+            .replace(',','')
+
+            .strip()
+        )
+
+        current['price'] += ev_price
+
+    except:
+        pass
+
+# ---------- CUSTOM EV ----------
+elif (
+    'Custom EV Training:' in line
+    and current
+):
+
+    current['ev_type'] = 'Custom EV'
+
+    try:
+
+        ev_price = int(
+
+            line.split(':')[1]
+
+            .replace('¥','')
+
+            .replace(',','')
+
+            .strip()
+        )
+
+        current['price'] += ev_price
+
+    except:
+        pass
 
                 except:
                     pass
