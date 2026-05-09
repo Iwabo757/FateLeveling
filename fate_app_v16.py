@@ -171,6 +171,8 @@ def layout(content):
 
         <a href='/add'>➕ Add Order</a>
 
+        <a href='/import'>📥 Import Order</a>
+
         <a href='/requests'>📋 Requests</a>
 
         <a href='/profits'>📈 Profit Analytics</a>
@@ -668,6 +670,366 @@ def current():
     """
 
     return layout(html)
+# ---------- ADD ORDER ----------
+@app.route('/add', methods=['GET', 'POST'])
+@login_required
+def add():
+
+    if not is_admin():
+        return redirect('/')
+
+    if request.method == 'POST':
+
+        client = request.form.get('client')
+
+        pokemon = []
+
+        names = request.form.getlist('pokemon')
+        starts = request.form.getlist('start')
+        ends = request.form.getlist('end')
+        evs = request.form.getlist('evs')
+
+        total = 0
+
+        for i in range(len(names)):
+
+            if not names[i].strip():
+                continue
+
+            start = int(starts[i] or 0)
+            end = int(ends[i] or 0)
+
+            gain = max(0, end - start)
+
+            price = gain // 10
+
+            ev_type = evs[i]
+
+            if ev_type.strip():
+                price += 12000
+
+            total += price
+
+            pokemon.append({
+
+                'name': names[i],
+
+                'start': start,
+
+                'end': end,
+
+                'ev_type': ev_type,
+
+                'price': price
+            })
+
+        data['orders'].append({
+
+            'id': data['counter'],
+
+            'client': client,
+
+            'pokemon': pokemon,
+
+            'total': total,
+
+            'paid': False,
+
+            'completed': False,
+
+            'start_date': datetime.now().strftime('%Y-%m-%d'),
+
+            'completion_date': ''
+        })
+
+        data['counter'] += 1
+
+        save_orders()
+
+        return redirect('/current')
+
+    return layout("""
+
+    <h2>➕ Add Order</h2>
+
+    <form method='post'>
+
+        Client Name:
+        <input name='client'>
+
+        <div id='pokemonRows'></div>
+
+        <button type='button'
+                class='btn'
+                onclick='addPokemon()'>
+
+            ➕ Add Pokémon
+
+        </button>
+
+        <br><br>
+
+        <button class='btn'>
+
+            ✅ Create Order
+
+        </button>
+
+    </form>
+
+    <script>
+
+    function addPokemon(){
+
+        let d = document.createElement('div');
+
+        d.className = 'pokemon';
+
+        d.innerHTML = `
+
+        <div style='width:100%'>
+
+        Pokémon:
+        <input name='pokemon'>
+
+        Start EXP:
+        <input name='start'>
+
+        Target EXP:
+        <input name='end'>
+
+        EV Training:
+        <input name='evs'
+               placeholder='Leave blank for none'>
+
+        <button type='button'
+                class='btn'
+                onclick='this.parentElement.parentElement.remove()'>
+
+            ❌ Remove
+
+        </button>
+
+        </div>
+        `;
+
+        document
+            .getElementById('pokemonRows')
+            .appendChild(d);
+    }
+
+    addPokemon();
+
+    </script>
+    """)
+# ---------- IMPORT WORK ORDER ----------
+@app.route('/import', methods=['GET', 'POST'])
+@login_required
+def import_order():
+
+    if not is_admin():
+        return redirect('/')
+
+    if request.method == 'POST':
+
+        text = request.form.get('text', '')
+
+        lines = text.splitlines()
+
+        pokemon = []
+
+        current_name = None
+        current_exp = 0
+        target_exp = 0
+        evs = "None"
+
+        total = 0
+
+        for line in lines:
+
+            line = line.strip()
+
+            # ---------- POKEMON ----------
+            if (
+                '(' in line
+                and 'xp' in line.lower()
+            ):
+
+                # save previous
+                if current_name:
+
+                    gain = (
+                        target_exp
+                        - current_exp
+                    )
+
+                    price = max(
+                        0,
+                        gain // 10
+                    )
+
+                    if evs != "None":
+                        price += 12000
+
+                    total += price
+
+                    pokemon.append({
+
+                        'name':
+                            current_name,
+
+                        'start':
+                            current_exp,
+
+                        'end':
+                            target_exp,
+
+                        'ev_type':
+                            evs,
+
+                        'price':
+                            price
+                    })
+
+                # reset
+                evs = "None"
+
+                # parse name
+                current_name = (
+                    line.split('(')[0]
+                    .strip()
+                    .replace('*','')
+                )
+
+                xp_text = (
+                    line.split('(')[1]
+                    .split(')')[0]
+                    .lower()
+                )
+
+                # parse xp
+                if '1m' in xp_text:
+                    target_exp = 1000000
+
+                elif '1.059' in xp_text:
+                    target_exp = 1059860
+
+                elif '1.25' in xp_text:
+                    target_exp = 1250000
+
+                else:
+                    target_exp = 1000000
+
+                current_exp = 0
+
+            # ---------- EVS ----------
+            elif (
+                '252' in line
+                or 'hp' in line.lower()
+            ):
+
+                evs = (
+                    line.replace('-','')
+                    .strip()
+                )
+
+        # ---------- FINAL SAVE ----------
+        if current_name:
+
+            gain = (
+                target_exp
+                - current_exp
+            )
+
+            price = max(
+                0,
+                gain // 10
+            )
+
+            if evs != "None":
+                price += 12000
+
+            total += price
+
+            pokemon.append({
+
+                'name':
+                    current_name,
+
+                'start':
+                    current_exp,
+
+                'end':
+                    target_exp,
+
+                'ev_type':
+                    evs,
+
+                'price':
+                    price
+            })
+
+        # ---------- CREATE ORDER ----------
+        data['orders'].append({
+
+            'id':
+                data['counter'],
+
+            'client':
+                request.form.get('client'),
+
+            'pokemon':
+                pokemon,
+
+            'total':
+                total,
+
+            'paid':
+                False,
+
+            'completed':
+                False,
+
+            'start_date':
+                datetime.now().strftime('%Y-%m-%d'),
+
+            'completion_date':
+                ''
+        })
+
+        data['counter'] += 1
+
+        save_orders()
+
+        return redirect('/current')
+
+    return layout("""
+
+    <h2>
+    📥 Import Discord Work Order
+    </h2>
+
+    <form method='post'>
+
+        Client Name:
+
+        <input name='client'>
+
+        Discord Work Order:
+
+        <textarea
+            name='text'
+            rows='20'></textarea>
+
+        <button class='btn'>
+
+            📥 Import Order
+
+        </button>
+
+    </form>
+
+    """)
 
 # ---------- CLIENT REQUEST ----------
 @app.route('/request-order', methods=['GET', 'POST'])
