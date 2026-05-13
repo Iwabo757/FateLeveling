@@ -1483,32 +1483,28 @@ def approve_request(i):
                     'ev_type': p['evs']
                 })
 
-            new_order = Order(
+        new_order = Order(
 
-    client=r['discord'],
+            client=client,
 
-    pokemon=json.dumps(pokemon),
+            pokemon=json.dumps(pokemon),
 
-    total=total,
+            total=total,
 
-    paid=False,
+            paid=False,
 
-    completed=False,
+            completed=False,
 
-    start_date=datetime.now().strftime('%Y-%m-%d'),
+            start_date=datetime.now().strftime('%Y-%m-%d'),
 
-    completion_date=''
-)
+            completion_date=''
+        )
 
-db.session.add(new_order)
+        db.session.add(new_order)
 
-db.session.commit()
+        db.session.commit()
 
-            break
-
-    save_requests(reqs)
-
-    return redirect('/current')
+        return redirect('/current')
 
 # ---------- DENY ----------
 @app.route('/deny-request/<int:i>')
