@@ -32,6 +32,52 @@ from werkzeug.security import (
 
 app = Flask(__name__)
 
+from flask_sqlalchemy import SQLAlchemy
+
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    "https://gryoyztwbpinlusjpsnm.supabase.co"
+)
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+class Order(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    client = db.Column(
+        db.String(100)
+    )
+
+    pokemon = db.Column(
+        db.Text
+    )
+
+    total = db.Column(
+        db.Integer
+    )
+
+    paid = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    completed = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    start_date = db.Column(
+        db.String(20)
+    )
+
+    completion_date = db.Column(
+        db.String(20)
+    )
+
 app.secret_key = "fate_secret_key"
 
 login_manager = LoginManager()
@@ -2107,6 +2153,10 @@ def completion_stats():
     """
 
     return layout(html)
+
+with app.app_context():
+
+    db.create_all()
 
 # ---------- RUN ----------
 if __name__ == "__main__":
