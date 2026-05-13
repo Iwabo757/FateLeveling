@@ -279,7 +279,7 @@
             "completion_date": "2026-05-07"
         },
         {
-            "id": 7,
+            "id": 6,
             "client": "yiesumsin",
             "pokemon": [
                 {
@@ -311,11 +311,11 @@
                 }
             ],
             "total": 339000,
-            "paid": false,
-            "completed": false,
+            "paid": true,
+            "completed": true,
             "start_date": "2026-05-09",
-            "completion_date": ""
+            "completion_date": "2026-05-11"
         }
     ],
-    "counter": 8
+    "counter": 7
 }
