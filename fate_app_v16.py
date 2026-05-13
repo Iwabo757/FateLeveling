@@ -2210,7 +2210,7 @@ with app.app_context():
 
     db.create_all()
 
-migrate_old_orders()
+    migrate_old_orders()
 
 # ---------- RUN ----------
 if __name__ == "__main__":
