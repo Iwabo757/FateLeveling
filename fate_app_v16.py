@@ -2154,9 +2154,63 @@ def completion_stats():
 
     return layout(html)
 
+# ---------- MIGRATE OLD JSON ----------
+def migrate_old_orders():
+
+    if not os.path.exists("orders.json"):
+        return
+
+    with open("orders.json", "r") as f:
+
+        old_data = json.load(f)
+
+    existing = Order.query.count()
+
+    # avoid duplicate importing
+    if existing > 0:
+        return
+
+    for o in old_data.get("orders", []):
+
+        new_order = Order(
+
+            client=o.get("client", ""),
+
+            pokemon=json.dumps(
+                o.get("pokemon", [])
+            ),
+
+            total=o.get("total", 0),
+
+            paid=o.get("paid", False),
+
+            completed=o.get(
+                "completed",
+                False
+            ),
+
+            start_date=o.get(
+                "start_date",
+                ""
+            ),
+
+            completion_date=o.get(
+                "completion_date",
+                ""
+            )
+        )
+
+        db.session.add(new_order)
+
+    db.session.commit()
+
+    print("Old orders imported.")
+
 with app.app_context():
 
     db.create_all()
+
+migrate_old_orders()
 
 # ---------- RUN ----------
 if __name__ == "__main__":
