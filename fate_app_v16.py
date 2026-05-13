@@ -823,7 +823,7 @@ db.session.add(new_order)
 
 db.session.commit()
 
-        return redirect('/current')
+    return redirect('/current')
 
     return layout("""
 
@@ -1110,7 +1110,7 @@ db.session.add(new_order)
 
 db.session.commit()
 
-        return redirect('/current')
+    return redirect('/current')
 
     return layout("""
 
