@@ -35,7 +35,7 @@ app = Flask(__name__)
 from flask_sqlalchemy import SQLAlchemy
 
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    "postgresql://postgres.gryoyztwbpinlusjpsnm:FateServieces123@aws-1-us-west-2.pooler.supabase.com:6543/postgres"
+    "postgresql+psycopg2://postgres.gryoyztwbpinlusjpsnm:FateServieces123@aws-1-us-west-2.pooler.supabase.com:6543/postgres"
 )
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -481,15 +481,17 @@ def logout():
 @login_required
 def home():
 
+    orders = Order.query.all()
+
     total = sum(
-        o.get("total", 0)
-        for o in data["orders"]
+        o.total or 0
+        for o in orders
     )
 
     unpaid = sum(
-        o.get("total", 0)
-        for o in data["orders"]
-        if not o.get("paid")
+        o.total or 0
+        for o in orders
+        if not o.paid
     )
 
     html = f"""
@@ -505,54 +507,47 @@ def home():
 
     return layout(html)
 
-# ---------- ORDERS ----------
+# ---------- CURRENT ----------
 @app.route('/current')
 @login_required
 def current():
 
     html = "<h2>Orders</h2>"
 
-    sorted_orders = sorted(
-
-        data.get("orders", []),
-
-        key=lambda o: (
-
-            o.get("completed", False),
-
-            o.get("paid", False),
-
-            o.get("id", 0)
-
-        )
-    )
+    sorted_orders = Order.query.order_by(
+        Order.completed.asc(),
+        Order.paid.asc(),
+        Order.id.desc()
+    ).all()
 
     for o in sorted_orders:
+
+        pokemon = json.loads(o.pokemon)
 
         total = sum(
 
             p.get("price", 0)
 
-            for p in o.get("pokemon", [])
+            for p in pokemon
 
         )
 
         paid_status = (
             "🟢 Paid"
-            if o.get("paid")
+            if o.paid
             else "🔴 Unpaid"
         )
 
         complete_status = (
-            "✅ Complete"
-            if o.get("completed")
-            else "⏳ In Progress"
+            "✅ Completed"
+            if o.completed
+            else "🟡 In Progress"
         )
 
         html += f"""
 
         <div class='card'
-             onclick="toggleOrder('o{o['id']}', 'arrow{o['id']}')"
+             onclick="toggleOrder('o{o.id}', 'arrow{o.id}')"
              style='cursor:pointer;
                     display:flex;
                     justify-content:space-between;
@@ -562,13 +557,13 @@ def current():
 
                 <h3 style='margin:0;'>
 
-                    {o.get('client')}
+                    {o.client}
 
                 </h3>
 
                 <div style='opacity:0.8;'>
 
-                    Order #{o['id']}
+                    Order #{o.id}
 
                 </div>
 
@@ -587,7 +582,7 @@ def current():
 
             </div>
 
-            <div id='arrow{o['id']}'
+            <div id='arrow{o.id}'
                  style='font-size:24px;
                         transition:0.2s;'>
 
@@ -597,22 +592,22 @@ def current():
 
         </div>
 
-        <div id='o{o['id']}'
+        <div id='o{o.id}'
              style='display:none;'>
 
             <div class='stat'>
 
                 📅 Started:
-                {o.get('start_date')}<br>
+                {o.start_date}<br>
 
                 🏁 Completed:
-                {o.get('completion_date') or 'In Progress'}
+                {o.completion_date or 'In Progress'}
 
             </div>
         """
 
         # ---------- POKEMON ----------
-        for p in o.get("pokemon", []):
+        for p in pokemon:
 
             start = p.get("start", 0)
 
@@ -692,21 +687,21 @@ def current():
 
             <br>
 
-            <a href='/pay/{o['id']}'
+            <a href='/pay/{o.id}'
                class='btn'>
 
                💰 Paid
 
             </a>
 
-            <a href='/complete/{o['id']}'
+            <a href='/complete/{o.id}'
                class='btn'>
 
                🏁 Complete
 
             </a>
 
-            <a href='/delete/{o['id']}'
+            <a href='/delete/{o.id}'
                class='btn'>
 
                🗑 Delete
@@ -807,28 +802,26 @@ def add():
                 'price': price
             })
 
-        data['orders'].append({
+        new_order = Order(
 
-            'id': data['counter'],
+    client=client,
 
-            'client': client,
+    pokemon=json.dumps(pokemon),
 
-            'pokemon': pokemon,
+    total=total,
 
-            'total': total,
+    paid=False,
 
-            'paid': False,
+    completed=False,
 
-            'completed': False,
+    start_date=datetime.now().strftime('%Y-%m-%d'),
 
-            'start_date': datetime.now().strftime('%Y-%m-%d'),
+    completion_date=''
+)
 
-            'completion_date': ''
-        })
+db.session.add(new_order)
 
-        data['counter'] += 1
-
-        save_orders()
+db.session.commit()
 
         return redirect('/current')
 
@@ -1096,28 +1089,26 @@ def import_order():
             total += current['price']
 
         # ---------- CREATE ORDER ----------
-        data['orders'].append({
+        new_order = Order(
 
-            'id': data['counter'],
+    client=request.form.get('client'),
 
-            'client': request.form.get('client'),
+    pokemon=json.dumps(pokemon),
 
-            'pokemon': pokemon,
+    total=total,
 
-            'total': total,
+    paid=False,
 
-            'paid': False,
+    completed=False,
 
-            'completed': False,
+    start_date=datetime.now().strftime('%Y-%m-%d'),
 
-            'start_date': datetime.now().strftime('%Y-%m-%d'),
+    completion_date=''
+)
 
-            'completion_date': ''
-        })
+db.session.add(new_order)
 
-        data['counter'] += 1
-
-        save_orders()
+db.session.commit()
 
         return redirect('/current')
 
@@ -1492,28 +1483,26 @@ def approve_request(i):
                     'ev_type': p['evs']
                 })
 
-            data['orders'].append({
+            new_order = Order(
 
-                'id': data['counter'],
+    client=r['discord'],
 
-                'client': r['discord'],
+    pokemon=json.dumps(pokemon),
 
-                'pokemon': pokemon,
+    total=total,
 
-                'total': total,
+    paid=False,
 
-                'paid': False,
+    completed=False,
 
-                'completed': False,
+    start_date=datetime.now().strftime('%Y-%m-%d'),
 
-                'start_date': datetime.now().strftime('%Y-%m-%d'),
+    completion_date=''
+)
 
-                'completion_date': ''
-            })
+db.session.add(new_order)
 
-            data['counter'] += 1
-
-            save_orders()
+db.session.commit()
 
             break
 
@@ -1723,12 +1712,13 @@ def pay(i):
     if not is_admin():
         return redirect('/')
 
-    for o in data['orders']:
+    order = Order.query.get(i)
 
-        if o['id'] == i:
-            o['paid'] = True
+    if order:
 
-    save_orders()
+        order.paid = True
+
+        db.session.commit()
 
     return redirect('/current')
 
@@ -1740,15 +1730,17 @@ def complete(i):
     if not is_admin():
         return redirect('/')
 
-    for o in data['orders']:
+    order = Order.query.get(i)
 
-        if o['id'] == i:
+    if order:
 
-            o['completed'] = True
+        order.completed = True
 
-            o['completion_date'] = datetime.now().strftime('%Y-%m-%d')
+        order.completion_date = (
+            datetime.now().strftime('%Y-%m-%d')
+        )
 
-    save_orders()
+        db.session.commit()
 
     return redirect('/current')
 
@@ -1760,12 +1752,13 @@ def delete(i):
     if not is_admin():
         return redirect('/')
 
-    data['orders'] = [
-        o for o in data['orders']
-        if o['id'] != i
-    ]
+    order = Order.query.get(i)
 
-    save_orders()
+    if order:
+
+        db.session.delete(order)
+
+        db.session.commit()
 
     return redirect('/current')
 
@@ -1779,11 +1772,11 @@ def profits():
 
     completed_orders = [
 
-        o for o in data['orders']
+        o for o in Order.query.all()
 
         if (
-            o.get('completed')
-            and o.get('completion_date')
+            o.completed
+            and o.completion_date
         )
     ]
 
@@ -1800,7 +1793,7 @@ def profits():
 
         key=lambda o:
             datetime.strptime(
-                o['completion_date'],
+                o.completion_date,
                 '%Y-%m-%d'
             )
     )
@@ -1818,9 +1811,9 @@ def profits():
 
     for o in completed_orders:
 
-        total = o.get('total', 0)
+        total = o.total or 0
 
-        raw_date = o.get('completion_date')
+        raw_date = o.completion_date
 
         dt = datetime.strptime(
             raw_date,
@@ -2085,27 +2078,27 @@ def completion_stats():
     pokemon_counts = []
     completion_days = []
 
-    for o in data['orders']:
+    for o in Order.query.all():
 
         if (
-            o.get('completed')
-            and o.get('completion_date')
+            o.completed
+            and o.completion_date
         ):
 
             start = datetime.strptime(
-                o['start_date'],
+                o.start_date,
                 '%Y-%m-%d'
             )
 
             end = datetime.strptime(
-                o['completion_date'],
+                o.completion_date,
                 '%Y-%m-%d'
             )
 
             days = (end - start).days
 
             pokemon_counts.append(
-                len(o.get('pokemon', []))
+                len(json.loads(o.pokemon))
             )
 
             completion_days.append(days)
