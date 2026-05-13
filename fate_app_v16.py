@@ -35,7 +35,7 @@ app = Flask(__name__)
 from flask_sqlalchemy import SQLAlchemy
 
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    "https://gryoyztwbpinlusjpsnm.supabase.co"
+    "postgresql://postgres:FateServieces123@db.gryoyztwbpinlusjpsnm.supabase.co:5432/postgres"
 )
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
