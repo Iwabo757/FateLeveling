@@ -135,19 +135,11 @@ def load_users():
 # ---------- REQUESTS ----------
 def load_requests():
 
-    if not os.path.exists(REQUESTS_FILE):
+    return Request.query.all()
 
-        with open(REQUESTS_FILE, "w") as f:
-            json.dump([], f)
+def save_requests():
 
-    with open(REQUESTS_FILE, "r") as f:
-        return json.load(f)
-
-
-def save_requests(reqs):
-
-    with open(REQUESTS_FILE, "w") as f:
-        json.dump(reqs, f, indent=4)
+    pass
 
 # ---------- ORDERS ----------
 def load_orders():
@@ -179,33 +171,54 @@ def save_orders():
     with open(ORDERS_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
+class Request(db.Model):
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    discord = db.Column(db.String(200))
+
+    ign = db.Column(db.String(200))
+
+    pokemon = db.Column(db.Text)
+
+    notes = db.Column(db.Text)
+
+    status = db.Column(db.String(50))
+
+    date = db.Column(db.String(50))
 # ---------- GLOBAL ----------
 data = load_orders()
 
 # ---------- UI ----------
 def layout(content):
 
-    sidebar = """
-
-    <div class='side'>
-
-        <h2>🎮 Fate</h2>
-
-    """
+    notif_html = ""
 
     pending_requests = len(load_requests())
 
     if pending_requests > 0:
 
-        sidebar += f"""
+        notif_html = f"""
 
         <div class='notif'>
 
-            🔔 {pending_requests} New Request(s)
+            🔔 {pending_requests} Pending Request(s)
 
         </div>
 
         """
+    sidebar = f"""
+
+    <div class='side'>
+
+        <h2>🎮 Fate</h2>
+        
+        {notif_html}
+
+    """
 
     # ---------- USER ----------
     if current_user.is_authenticated:
@@ -1189,8 +1202,6 @@ def request_order():
 
     if request.method == 'POST':
 
-        reqs = load_requests()
-
         pokemon = []
 
         names = request.form.getlist("pokemon")
@@ -1217,30 +1228,30 @@ def request_order():
                 "evs": evs[i]
             })
 
-        reqs.append({
+        discord = request.form.get("discord")
 
-            "id": len(reqs) + 1,
+        ign = request.form.get("ign")
 
-            "user": (
-    current_user.id
-    if current_user.is_authenticated
-    else "Guest"
-),
+        notes = request.form.get("notes")
 
-            "discord": request.form.get("discord"),
+        new_request = Request(
 
-            "ign": request.form.get("ign"),
+            discord=discord,
 
-            "pokemon": pokemon,
+            ign=ign,
 
-            "notes": request.form.get("notes"),
+            pokemon=json.dumps(pokemon),
 
-            "status": "Pending",
+            notes=notes,
 
-            "date": datetime.now().strftime("%Y-%m-%d")
-        })
+            status="Pending",
 
-        save_requests(reqs)
+            date=datetime.now().strftime("%m/%d/%Y")
+        )
+
+        db.session.add(new_request)
+
+        db.session.commit()
 
         return layout("<h2>✅ Request Submitted</h2>")
 
@@ -1345,7 +1356,7 @@ def requests():
 
     reqs = sorted(
         reqs,
-        key=lambda r: r['id'],
+        key=lambda r: r.id,
         reverse=True
     )
 
@@ -1355,7 +1366,7 @@ def requests():
 
         pokemon_html = ""
 
-        for p in r.get("pokemon", []):
+        for p in json.loads(r.pokemon):
 
             service = p.get("service", "")
 
@@ -1399,7 +1410,7 @@ def requests():
                     →
                     {target_exp:,}<br>
 
-                    ⚡ {p.get('evs','None')}<br>
+                    ⚡ {p.get('evs', 'None')}<br>
 
                     💰 {price:,}¥
 
@@ -1412,13 +1423,13 @@ def requests():
 
 <div class='card'>
 
-    <h3>{r['discord']}</h3>
+    <h3>{r.discord}</h3>
 
-    👤 IGN: {r['ign']}<br>
+    👤 IGN: {r.ign}<br>
 
-    📅 {r['date']}<br>
+    📅 {r.date}<br>
 
-    📌 {r['status']}
+    📌 {r.status}
 
     <br><br>
 
@@ -1433,25 +1444,25 @@ def requests():
 
     <div class='stat'>
 
-        📝 {r.get('notes','None')}
+        📝 {r.notes or None}
 
     </div>
 
-    <a href='/edit-request/{r["id"]}'
+    <a href='/edit-request/{r.id}'
        class='btn'>
 
        ✏ Edit
 
     </a>
 
-    <a href='/approve-request/{r["id"]}'
+    <a href='/approve-request/{r.id}'
        class='btn'>
 
        ✅ Approve + Convert
 
     </a>
 
-    <a href='/deny-request/{r["id"]}'
+    <a href='/deny-request/{r.id}'
        class='btn'>
 
        ❌ Deny
@@ -1475,24 +1486,23 @@ def approve_request(i):
 
     for r in reqs:
 
-        if r['id'] == i:
+        if r.id == i:
 
-            r['status'] = 'Approved'
+            r.status = 'Approved'
 
             pokemon = []
 
             total = 0
 
-            for p in r.get('pokemon', []):
+            for p in json.loads(r.pokemon):
 
                 service = p.get('service', '')
 
                 current_exp = int(
-                    p.get('current_exp') or 0
+                    p.get('current_exp', 0)
                 )
-
                 target_exp = int(
-                    p.get('target_exp') or 0
+                    p.get('target_exp', 0)
                 )
 
                 price = 0
@@ -1513,7 +1523,7 @@ def approve_request(i):
 
                 pokemon.append({
 
-                    'name': p['pokemon'],
+                    'name': p.get('pokemon'),
 
                     'price': price,
 
@@ -1523,12 +1533,12 @@ def approve_request(i):
 
                     'end': target_exp,
 
-                    'ev_type': p['evs']
+                    'ev_type': p.get('evs', '')
                 })
 
             new_order = Order(
 
-                client=r['discord'],
+                client=r.discord,
 
                 pokemon=json.dumps(pokemon),
 
@@ -1557,40 +1567,23 @@ def deny_request(i):
     if not is_admin():
         return redirect('/')
 
-    reqs = load_requests()
+    r = Request.query.get(i)
 
-    # delete request completely
-    reqs = [
+    if r:
 
-        r for r in reqs
+        db.session.delete(r)
 
-        if r['id'] != i
-    ]
-
-    save_requests(reqs)
+        db.session.commit()
 
     return redirect('/requests')
+
 # ---------- EDIT REQUEST ----------
 @app.route('/edit-request/<int:i>',
            methods=['GET', 'POST'])
 @login_required
 def edit_request(i):
 
-    if not is_admin():
-        return redirect('/')
-
-    reqs = load_requests()
-
-    req = None
-
-    for r in reqs:
-
-        if r['id'] == i:
-            req = r
-            break
-
-    if not req:
-        return redirect('/requests')
+    return redirect('/requests')
 
     # ---------- SAVE ----------
     if request.method == 'POST':
