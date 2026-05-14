@@ -408,14 +408,15 @@ def layout(content):
     animation:pulse 1.5s infinite;
 }
 
-@keyframes pulse{
+@keyframes pulse{{
 
-    0%{opacity:1;}
+    0%{{opacity:1;}}
 
-    50%{opacity:.5;}
+    50%{{opacity:.5;}}
 
-    100%{opacity:1;}
-}
+    100%{{opacity:1;}}
+
+}}
   
   </style>
 
