@@ -193,6 +193,20 @@ def layout(content):
 
     """
 
+    pending_requests = len(load_requests())
+
+    if pending_requests > 0:
+
+        sidebar += f"""
+
+        <div class='notif'>
+
+            🔔 {pending_requests} New Request(s)
+
+        </div>
+
+        """
+
     # ---------- USER ----------
     if current_user.is_authenticated:
 
@@ -375,8 +389,35 @@ def layout(content):
         border-radius:8px;
         margin-bottom:15px;
     }}
+.notif{
 
-    </style>
+    background:#ff0055;
+
+    color:white;
+
+    padding:10px;
+
+    border-radius:10px;
+
+    margin-top:15px;
+
+    font-weight:bold;
+
+    text-align:center;
+
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+
+    0%{opacity:1;}
+
+    50%{opacity:.5;}
+
+    100%{opacity:1;}
+}
+  
+  </style>
 
     {sidebar}
 
@@ -1356,7 +1397,7 @@ def requests():
                     →
                     {target_exp:,}<br>
 
-                    ⚡ {p['evs']}<br>
+                    ⚡ {p.get('evs','None')}<br>
 
                     💰 {price:,}¥
 
@@ -1393,22 +1434,22 @@ def requests():
         📝 {r.get('notes','None')}
 
     </div>
-    
+
     <a href='/edit-request/{r["id"]}'
        class='btn'>
 
        ✏ Edit
 
     </a>
-    
-    <a href="/approve-request/{r['id']}"
+
+    <a href='/approve-request/{r["id"]}'
        class='btn'>
 
        ✅ Approve + Convert
 
     </a>
 
-    <a href="/deny-request/{r['id']}"
+    <a href='/deny-request/{r["id"]}'
        class='btn'>
 
        ❌ Deny
