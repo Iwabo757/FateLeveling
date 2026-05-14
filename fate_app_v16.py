@@ -804,26 +804,26 @@ def add():
 
         new_order = Order(
 
-    client=client,
+            client=client,
 
-    pokemon=json.dumps(pokemon),
+            pokemon=json.dumps(pokemon),
 
-    total=total,
+            total=total,
 
-    paid=False,
+            paid=False,
 
-    completed=False,
+            completed=False,
 
-    start_date=datetime.now().strftime('%Y-%m-%d'),
+            start_date=datetime.now().strftime('%Y-%m-%d'),
 
-    completion_date=''
-)
+            completion_date=''
+        )
 
-db.session.add(new_order)
+        db.session.add(new_order)
 
-db.session.commit()
+        db.session.commit()
 
-    return redirect('/current')
+        return redirect('/current')
 
     return layout("""
 
@@ -1091,26 +1091,26 @@ def import_order():
         # ---------- CREATE ORDER ----------
         new_order = Order(
 
-    client=request.form.get('client'),
+            client=request.form.get('client'),
 
-    pokemon=json.dumps(pokemon),
+            pokemon=json.dumps(pokemon),
 
-    total=total,
+            total=total,
 
-    paid=False,
+            paid=False,
 
-    completed=False,
+            completed=False,
 
-    start_date=datetime.now().strftime('%Y-%m-%d'),
+            start_date=datetime.now().strftime('%Y-%m-%d'),
 
-    completion_date=''
-)
+            completion_date=''
+        )
 
-db.session.add(new_order)
+        db.session.add(new_order)
 
-db.session.commit()
+        db.session.commit()
 
-    return redirect('/current')
+        return redirect('/current')
 
     return layout("""
 
@@ -1483,28 +1483,28 @@ def approve_request(i):
                     'ev_type': p['evs']
                 })
 
-        new_order = Order(
+            new_order = Order(
 
-            client=client,
+                client=r['discord'],
 
-            pokemon=json.dumps(pokemon),
+                pokemon=json.dumps(pokemon),
 
-            total=total,
+                total=total,
 
-            paid=False,
+                paid=False,
 
-            completed=False,
+                completed=False,
 
-            start_date=datetime.now().strftime('%Y-%m-%d'),
+                start_date=datetime.now().strftime('%Y-%m-%d'),
 
-            completion_date=''
-        )
+                completion_date=''
+            )
 
-        db.session.add(new_order)
+            db.session.add(new_order)
 
-        db.session.commit()
+            db.session.commit()
 
-        return redirect('/current')
+    return redirect('/current')
 
 # ---------- DENY ----------
 @app.route('/deny-request/<int:i>')
@@ -2204,20 +2204,22 @@ with app.app_context():
 # ---------- RUN ----------
 if __name__ == "__main__":
 
-    def open_browser():
+    if os.environ.get("RENDER") is None:
 
-        time.sleep(1)
+        def open_browser():
 
-        webbrowser.open(
-            "http://127.0.0.1:5000"
-        )
+            time.sleep(1)
 
-    threading.Thread(
-        target=open_browser
-    ).start()
+            webbrowser.open(
+                "http://127.0.0.1:5000"
+            )
+
+        threading.Thread(
+            target=open_browser
+        ).start()
 
     app.run(
-        host="127.0.0.1",
-        port=5000,
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
         debug=False
     )
