@@ -389,7 +389,8 @@ def layout(content):
         border-radius:8px;
         margin-bottom:15px;
     }}
-.notif{
+
+.notif{{
 
     background:#ff0055;
 
@@ -406,7 +407,7 @@ def layout(content):
     text-align:center;
 
     animation:pulse 1.5s infinite;
-}
+}}
 
 @keyframes pulse{{
 
