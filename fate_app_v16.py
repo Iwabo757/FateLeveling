@@ -1496,11 +1496,11 @@ def approve_request(i):
         service = p.get('service', '')
 
         current_exp = int(
-            p.get('current_exp', 0)
+            p.get('current_exp') or 0
         )
 
         target_exp = int(
-            p.get('target_exp', 0)
+            p.get('target_exp') or 0
         )
 
         price = 0
