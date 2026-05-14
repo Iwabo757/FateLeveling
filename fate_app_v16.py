@@ -1482,80 +1482,82 @@ def approve_request(i):
     if not is_admin():
         return redirect('/')
 
-    reqs = load_requests()
+    r = Request.query.get(i)
 
-    for r in reqs:
+    if not r:
+        return redirect('/requests')
 
-        if r.id == i:
+    pokemon = []
 
-            r.status = 'Approved'
+    total = 0
 
-            pokemon = []
+    for p in json.loads(r.pokemon):
 
-            total = 0
+        service = p.get('service', '')
 
-            for p in json.loads(r.pokemon):
+        current_exp = int(
+            p.get('current_exp', 0)
+        )
 
-                service = p.get('service', '')
+        target_exp = int(
+            p.get('target_exp', 0)
+        )
 
-                current_exp = int(
-                    p.get('current_exp', 0)
-                )
-                target_exp = int(
-                    p.get('target_exp', 0)
-                )
+        price = 0
 
-                price = 0
+        if (
+            'Leveling' in service
+            and target_exp > current_exp
+        ):
 
-                if (
-                    'Leveling' in service
-                    and target_exp > current_exp
-                ):
+            price += (
+                target_exp - current_exp
+            ) // 10
 
-                    price += (
-                        target_exp - current_exp
-                    ) // 10
+        if 'EV' in service:
 
-                if 'EV' in service:
-                    price += 12000
+            price += 12000
 
-                total += price
+        total += price
 
-                pokemon.append({
+        pokemon.append({
 
-                    'name': p.get('pokemon'),
+            'name': p.get('pokemon'),
 
-                    'price': price,
+            'price': price,
 
-                    'type': 'leveling',
+            'type': 'leveling',
 
-                    'start': current_exp,
+            'start': current_exp,
 
-                    'end': target_exp,
+            'end': target_exp,
 
-                    'ev_type': p.get('evs', '')
-                })
+            'ev_type': p.get('evs', '')
+        })
 
-            new_order = Order(
+    new_order = Order(
 
-                client=r.discord,
+        client=r.discord,
 
-                pokemon=json.dumps(pokemon),
+        pokemon=json.dumps(pokemon),
 
-                total=total,
+        total=total,
 
-                paid=False,
+        paid=False,
 
-                completed=False,
+        completed=False,
 
-                start_date=datetime.now().strftime('%Y-%m-%d'),
+        start_date=datetime.now().strftime('%Y-%m-%d'),
 
-                completion_date=''
-            )
+        completion_date=''
+    )
 
-            db.session.add(new_order)
+    db.session.add(new_order)
 
-            db.session.commit()
+    # DELETE REQUEST AFTER APPROVAL
+    db.session.delete(r)
+
+    db.session.commit()
 
     return redirect('/current')
 
