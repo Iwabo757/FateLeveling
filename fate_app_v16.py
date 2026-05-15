@@ -35,7 +35,7 @@ app = Flask(__name__)
 from flask_sqlalchemy import SQLAlchemy
 
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    "postgresql+psycopg2://postgres.gryoyztwbpinlusjpsnm:FateServieces123@aws-1-us-west-2.pooler.supabase.com:6543/postgres"
+    os.environ.get("postgresql+psycopg2://postgres.gryoyztwbpinlusjpsnm:FateServieces123@aws-1-us-west-2.pooler.supabase.com:6543/postgres")
 )
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -578,7 +578,13 @@ def current():
 
     for o in sorted_orders:
 
-        pokemon = json.loads(o.pokemon)
+        try:
+
+            pokemon = json.loads(o.pokemon)
+
+        except:
+
+            pokemon = []
 
         total = sum(
 
@@ -1366,7 +1372,13 @@ def requests():
 
         pokemon_html = ""
 
-        for p in json.loads(r.pokemon):
+        pokemon_data = json.loads(r.pokemon)
+
+        if not isinstance(pokemon_data, list):
+
+            pokemon_data = []
+
+        for p in pokemon_data:
 
             service = p.get("service", "")
 
@@ -1390,6 +1402,7 @@ def requests():
                 ) // 10
 
             if "EV" in service:
+
                 price += 12000
 
             estimated_total += price
@@ -1398,11 +1411,11 @@ def requests():
 
             <div class='pokemon'>
 
-                <img src='{sprite(p['pokemon'])}'>
+                <img src='{sprite(p.get("pokemon", "bulbasaur"))}'>
 
                 <div>
 
-                    <b>{p['pokemon']}</b><br>
+                    <b>{p.get('pokemon', 'Unknown')}</b><br>
 
                     📦 {service}<br>
 
@@ -1493,14 +1506,32 @@ def approve_request(i):
 
     for p in json.loads(r.pokemon):
 
-        service = p.get('service', '')
+        if not isinstance(p, dict):
+            continue
+
+        pokemon_name = (
+            p.get('pokemon')
+            or p.get('name')
+            or 'Unknown'
+        )
+
+        service = (
+            p.get('service')
+            or ''
+        )
 
         current_exp = int(
-            p.get('current_exp') or 0
+            (p.get('current_exp') or p.get('start') or '0').strip()
         )
 
         target_exp = int(
-            p.get('target_exp') or 0
+            (p.get('target_exp') or p.get('end') or '0').strip()
+        )
+
+        evs = (
+            p.get('evs')
+            or p.get('ev_type')
+            or ''
         )
 
         price = 0
@@ -1522,7 +1553,7 @@ def approve_request(i):
 
         pokemon.append({
 
-            'name': p.get('pokemon'),
+            'name': pokemon_name,
 
             'price': price,
 
@@ -1532,7 +1563,7 @@ def approve_request(i):
 
             'end': target_exp,
 
-            'ev_type': p.get('evs', '')
+            'ev_type': evs
         })
 
     new_order = Order(
@@ -1554,7 +1585,6 @@ def approve_request(i):
 
     db.session.add(new_order)
 
-    # DELETE REQUEST AFTER APPROVAL
     db.session.delete(r)
 
     db.session.commit()
@@ -1586,157 +1616,6 @@ def deny_request(i):
 def edit_request(i):
 
     return redirect('/requests')
-
-    # ---------- SAVE ----------
-    if request.method == 'POST':
-
-        req['discord'] = request.form.get(
-            'discord'
-        )
-
-        req['ign'] = request.form.get(
-            'ign'
-        )
-
-        req['notes'] = request.form.get(
-            'notes'
-        )
-
-        pokemon = []
-
-        names = request.form.getlist(
-            'pokemon'
-        )
-
-        services = request.form.getlist(
-            'service'
-        )
-
-        current_exp = request.form.getlist(
-            'current_exp'
-        )
-
-        target_exp = request.form.getlist(
-            'target_exp'
-        )
-
-        evs = request.form.getlist(
-            'evs'
-        )
-
-        for x in range(len(names)):
-
-            pokemon.append({
-
-                'pokemon': names[x],
-
-                'service': services[x],
-
-                'current_exp':
-                    current_exp[x],
-
-                'target_exp':
-                    target_exp[x],
-
-                'evs':
-                    evs[x]
-            })
-
-        req['pokemon'] = pokemon
-
-        save_requests(reqs)
-
-        return redirect('/requests')
-
-    # ---------- FORM ----------
-    pokemon_html = ""
-
-    for p in req.get('pokemon', []):
-
-        pokemon_html += f"""
-
-        <div class='pokemon'>
-
-            <div style='width:100%'>
-
-            Pokémon:
-            <input name='pokemon'
-                   value='{p['pokemon']}'>
-
-            Service:
-            <select name='service'>
-
-                <option
-                {'selected' if p['service']=='Leveling' else ''}>
-                Leveling
-                </option>
-
-                <option
-                {'selected' if p['service']=='EV Training' else ''}>
-                EV Training
-                </option>
-
-                <option
-                {'selected' if p['service']=='Leveling + EV' else ''}>
-                Leveling + EV
-                </option>
-
-                <option
-                {'selected' if p['service']=='Custom' else ''}>
-                Custom
-                </option>
-
-            </select>
-
-            Current EXP:
-            <input name='current_exp'
-                   value='{p['current_exp']}'>
-
-            Target EXP:
-            <input name='target_exp'
-                   value='{p['target_exp']}'>
-
-            EV Spread:
-            <input name='evs'
-                   value='{p['evs']}'>
-
-            </div>
-
-        </div>
-        """
-
-    return layout(f"""
-
-    <h2>
-    ✏ Edit Request
-    </h2>
-
-    <form method='post'>
-
-        Discord:
-        <input name='discord'
-               value='{req['discord']}'>
-
-        IGN:
-        <input name='ign'
-               value='{req['ign']}'>
-
-        {pokemon_html}
-
-        Notes:
-
-        <textarea name='notes'>
-        {req.get('notes','')}
-        </textarea>
-
-        <button class='btn'>
-
-            💾 Save Changes
-
-        </button>
-
-    </form>
-    """)
 
 # ---------- PAY ----------
 @app.route('/pay/<int:i>')
