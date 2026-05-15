@@ -51,7 +51,9 @@ class Order(db.Model):
     client = db.Column(
         db.String(100)
     )
-
+    discord = db.Column(
+        db.String(200)
+    )
     pokemon = db.Column(
         db.Text
     )
@@ -622,6 +624,13 @@ def current():
                     {o.client}
 
                 </h3>
+
+                <div style='opacity:0.7;
+                            font-size:14px;'>
+
+                    {getattr(o, "discord", "")}
+
+                </div>
 
                 <div style='opacity:0.8;'>
 
@@ -1604,7 +1613,9 @@ def approve_request(i):
 
     new_order = Order(
 
-        client=r.discord,
+        client=r.ign or r.discord,
+
+        discord=r.discord,
 
         pokemon=json.dumps(pokemon),
 
@@ -2118,6 +2129,8 @@ def migrate_old_orders():
 
             client=o.get("client", ""),
 
+            discord=o.get("discord", ""),
+
             pokemon=json.dumps(
                 o.get("pokemon", [])
             ),
@@ -2149,6 +2162,8 @@ def migrate_old_orders():
     print("Old orders imported.")
 
 with app.app_context():
+
+    db.drop_all()
 
     db.create_all()
 
