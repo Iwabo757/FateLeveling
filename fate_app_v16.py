@@ -696,11 +696,11 @@ def current():
 
             <div class='pokemon'>
 
-                <img src='{sprite(p['name'])}'>
+                <img src='{sprite(p.get("name", "bulbasaur"))}'>
 
                 <div>
 
-                    <b>{p['name']}</b><br>
+                    <b>{p.get('name', 'Unknown')}</b><br>
 
                     🧮
                     {start:,}
@@ -1382,13 +1382,29 @@ def requests():
 
             service = p.get("service", "")
 
-            current_exp = int(
-                p.get("current_exp") or 0
-            )
+            try:
 
-            target_exp = int(
-                p.get("target_exp") or 0
-            )
+                current_exp = int(
+                    str(
+                        p.get("current_exp") or 0
+                    ).replace(",", "").strip()
+                )
+
+            except:
+
+                current_exp = 0
+
+            try:
+
+                target_exp = int(
+                    str(
+                        p.get("target_exp") or 0
+                    ).replace(",", "").strip()
+                )
+
+            except:
+
+                target_exp = 0
 
             price = 0
 
@@ -1520,13 +1536,33 @@ def approve_request(i):
             or ''
         )
 
-        current_exp = int(
-            (p.get('current_exp') or p.get('start') or '0').strip()
-        )
+        try:
 
-        target_exp = int(
-            (p.get('target_exp') or p.get('end') or '0').strip()
-        )
+            current_exp = int(
+                str(
+                    p.get('current_exp')
+                    or p.get('start')
+                    or 0
+                ).replace(',', '').strip()
+            )
+
+        except:
+
+            current_exp = 0
+
+        try:
+
+            target_exp = int(
+                str(
+                    p.get('target_exp')
+                    or p.get('end')
+                    or 0
+                ).replace(',', '').strip()
+            )
+
+        except:
+
+            target_exp = 0
 
         evs = (
             p.get('evs')
