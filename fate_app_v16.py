@@ -771,25 +771,25 @@ body::before {{
 
 <script>
 
-function toggleMenu(){
+function toggleMenu(){{
 
     let s =
         document.getElementById('sidebar');
 
     s.classList.toggle('show');
-}
+}}
 
-function closeMenu(){
+function closeMenu(){{
 
-    if(window.innerWidth <= 900){
+    if(window.innerWidth <= 900){{
 
         document
             .getElementById('sidebar')
             .classList.remove('show');
-    }
-}
+    }}
+}}
 
-document.addEventListener('click', function(e){
+document.addEventListener('click', function(e){{
 
     let sidebar =
         document.getElementById('sidebar');
@@ -813,14 +813,13 @@ document.addEventListener('click', function(e){
 
         !button.contains(e.target)
 
-    ){
+    ){{
 
         sidebar.classList.remove('show');
-    }
-});
+    }}
+}});
 
 </script>
-
 <body>
 
     {sidebar}
