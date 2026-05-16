@@ -1855,8 +1855,122 @@ def deny_request(i):
 @login_required
 def edit_request(i):
 
-    return redirect('/requests')
+    if not is_admin():
+        return redirect('/')
 
+    r = Request.query.get(i)
+
+    if not r:
+        return redirect('/requests')
+
+    pokemon_data = json.loads(r.pokemon)
+
+    if request.method == 'POST':
+
+        r.discord = request.form.get('discord')
+
+        r.ign = request.form.get('ign')
+
+        r.notes = request.form.get('notes')
+
+        pokemon = []
+
+        names = request.form.getlist("pokemon")
+
+        services = request.form.getlist("service")
+
+        current_exp = request.form.getlist("current_exp")
+
+        target_exp = request.form.getlist("target_exp")
+
+        evs = request.form.getlist("evs")
+
+        for x in range(len(names)):
+
+            if not names[x].strip():
+                continue
+
+            pokemon.append({
+
+                "pokemon": names[x],
+
+                "service": services[x],
+
+                "current_exp": current_exp[x],
+
+                "target_exp": target_exp[x],
+
+                "evs": evs[x]
+            })
+
+        r.pokemon = json.dumps(pokemon)
+
+        db.session.commit()
+
+        return redirect('/requests')
+
+    pokemon_html = ""
+
+    for p in pokemon_data:
+
+        pokemon_html += f"""
+
+        <div class='pokemon'>
+
+            <div style='width:100%'>
+
+                Pokémon:
+                <input name='pokemon'
+                       value='{p.get("pokemon","")}'>
+
+                Service:
+                <input name='service'
+                       value='{p.get("service","")}'>
+
+                Current EXP:
+                <input name='current_exp'
+                       value='{p.get("current_exp","")}'>
+
+                Target EXP:
+                <input name='target_exp'
+                       value='{p.get("target_exp","")}'>
+
+                EV Spread:
+                <input name='evs'
+                       value='{p.get("evs","")}'>
+
+            </div>
+
+        </div>
+        """
+
+    return layout(f"""
+
+    <h2>✏ Edit Request</h2>
+
+    <form method='post'>
+
+        Discord Name:
+        <input name='discord'
+               value='{r.discord}'>
+
+        IGN:
+        <input name='ign'
+               value='{r.ign}'>
+
+        {pokemon_html}
+
+        Notes:
+        <textarea name='notes'>{r.notes}</textarea>
+
+        <button class='btn'>
+
+            💾 Save Changes
+
+        </button>
+
+    </form>
+    """)
 # ---------- PAY ----------
 @app.route('/pay/<int:i>')
 @login_required
