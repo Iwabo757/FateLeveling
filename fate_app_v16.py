@@ -313,7 +313,7 @@ def layout(content):
 
     <style>
 
-body {
+body {{
 
     background-image: url('/static/bg.png');
 
@@ -332,9 +332,9 @@ body {
     font-family: sans-serif;
 
     display:flex;
-}
+}}
 
-body::before {
+body::before {{
 
     content: "";
 
@@ -349,9 +349,9 @@ body::before {
     background: rgba(0,0,0,0.72);
 
     z-index: -1;
-}
+}}
 
-.side {
+.side {{
 
     width:240px;
 
@@ -375,9 +375,9 @@ body::before {
     border-right: 2px solid rgba(138,43,226,.35);
 
     backdrop-filter: blur(6px);
-}
+}}
 
-.side a {
+.side a {{
 
     display:block;
 
@@ -401,16 +401,16 @@ body::before {
     text-align:center;
 
     font-weight:bold;
-}
+}}
 
-.side a:hover {
+.side a:hover {{
 
     background:rgba(138,43,226,.22);
 
     transform:translateX(4px);
-}
+}}
 
-.logo {
+.logo {{
 
     font-size:32px;
 
@@ -426,18 +426,18 @@ body::before {
 
     animation:
         glow 2.5s ease-in-out infinite alternate;
-}
+}}
 
-.main {
+.main {{
 
     flex:1;
 
     padding:20px;
 
     backdrop-filter: blur(2px);
-}
+}}
 
-.card {
+.card {{
 
     background: rgba(10, 10, 25, 0.82);
 
@@ -453,9 +453,9 @@ body::before {
     margin-bottom: 20px;
 
     border: 1px solid rgba(255,255,255,0.08);
-}
+}}
 
-.pokemon {
+.pokemon {{
 
     background:
         linear-gradient(
@@ -479,15 +479,15 @@ body::before {
     gap:10px;
 
     transition:.2s;
-}
+}}
 
-.pokemon:hover {
+.pokemon:hover {{
 
     transform:translateY(-2px);
 
     box-shadow:
         0 0 18px rgba(138,43,226,.22);
-}
+}}
 
     .pokemon img {{
         width:60px;
@@ -511,13 +511,13 @@ body::before {
         transition:.2s;
     }}
 
-.btn:hover {
+.btn:hover {{
 
     transform:translateY(-2px);
 
     box-shadow:
         0 0 15px rgba(0,255,200,.35);
-}
+}}
     
 
     input,
@@ -531,7 +531,7 @@ body::before {
         margin-bottom:10px;
     }}
 
-.stat {
+.stat {{
 
     background:
         linear-gradient(
@@ -549,7 +549,7 @@ body::before {
 
     box-shadow:
         0 0 14px rgba(138,43,226,.08);
-}
+}}
 
     .userbox {{
         background:#141426;
@@ -577,39 +577,39 @@ body::before {
     animation:pulse 1.5s infinite;
 }}
   
-@keyframes pulse{
+@keyframes pulse{{
 
-    0%{opacity:1;}
+    0%{{opacity:1;}}
 
-    50%{opacity:.5;}
+    50%{{opacity:.5;}}
 
-    100%{opacity:1;}
-}
+    100%{{opacity:1;}}
+}}
 
 @keyframes glow {
 
-    from {
+    from {{
 
-        text-shadow:
+    text-shadow:
             0 0 8px rgba(138,43,226,.45),
             0 0 18px rgba(79,70,229,.25);
-    }
+    }}
 
-    to {
+    to {{
 
         text-shadow:
             0 0 18px rgba(138,43,226,.85),
             0 0 40px rgba(79,70,229,.55);
-    }
+    }}
 }
-@media (max-width: 900px){
+@media (max-width: 900px){{
 
-    body{
+    body{{
 
         flex-direction:column;
-    }
+    }}
 
-    .side{
+    .side{{
 
         width:100%;
 
@@ -619,13 +619,13 @@ body::before {
 
         border-bottom:
             2px solid rgba(138,43,226,.25);
-    }
+    }}
 
-    .main{
+    .main{{
 
         padding:12px;
-    }
-}
+    }}
+}}
 
   </style>
 
