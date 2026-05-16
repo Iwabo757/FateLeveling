@@ -996,8 +996,15 @@ def logout():
 
 # ---------- DASHBOARD ----------
 @app.route('/')
-@login_required
 def home():
+
+    if not current_user.is_authenticated:
+
+        return redirect('/request-order')
+
+    if not is_admin():
+
+        return redirect('/request-order')
 
     orders = Order.query.all()
 
