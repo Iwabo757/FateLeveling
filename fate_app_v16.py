@@ -214,7 +214,18 @@ def layout(content):
         """
     sidebar = f"""
 
-    <div class='side'>
+    <div class='mobile-top'>
+
+    <button class='menu-btn'
+            onclick='toggleMenu()'>
+
+        ☰ Menu
+
+    </button>
+
+</div>
+
+<div class='side' id='sidebar'>
 <h2 class='logo'>🎮 Fate</h2>
         
         {notif_html}
@@ -238,29 +249,66 @@ def layout(content):
     if is_admin():
 
         sidebar += """
+<a href='/'
+   onclick="closeMenu()">
 
-        <a href='/'>Dashboard</a>
+   Dashboard
 
-        <a href='/current'>Orders</a>
+</a>
 
-        <a href='/add'>➕ Add Order</a>
+<a href='/current'
+   onclick="closeMenu()">
 
-        <a href='/import'>📥 Import Order</a>
+   Orders
 
-        <a href='/requests'>📋 Requests</a>
+</a>
 
-        <a href='/profits'>📈 Profit Analytics</a>
+<a href='/add'
+   onclick="closeMenu()">
 
-        <a href='/completion-stats'>⏱ Completion Stats</a>
+   ➕ Add Order
 
-        """
+</a>
+
+<a href='/import'
+   onclick="closeMenu()">
+
+   📥 Import Order
+
+</a>
+
+<a href='/requests'
+   onclick="closeMenu()">
+
+   📋 Requests
+
+</a>
+
+<a href='/profits'
+   onclick="closeMenu()">
+
+   📈 Profit Analytics
+
+</a>
+
+<a href='/completion-stats'
+   onclick="closeMenu()">
+
+   ⏱ Completion Stats
+
+</a>
+
+"""
 
     # ---------- EVERYONE ----------
     sidebar += """
 
-    <a href='/request-order'>
-    📝 Submit Request
-    </a>
+    <a href='/request-order'
+   onclick="closeMenu()">
+
+📝 Submit Request
+
+</a>
 
     """
 
@@ -269,9 +317,12 @@ def layout(content):
 
         sidebar += """
 
-        <a href='/logout'>
-        🚪 Logout
-        </a>
+        <a href='/logout'
+   onclick="closeMenu()">
+
+🚪 Logout
+
+</a>
 
         """
 
@@ -399,7 +450,7 @@ body::before {{
     border:1px solid rgba(255,255,255,.04);
     
     text-align:center;
-
+    
     font-weight:bold;
 }}
 
@@ -627,7 +678,150 @@ body::before {{
     }}
 }}
 
-  </style>
+.mobile-top{{
+
+    display:none;
+}}
+
+.menu-btn{{
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #4f46e5
+        );
+
+    border:none;
+
+    color:white;
+
+    padding:12px 18px;
+
+    border-radius:12px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    margin:10px;
+}}
+
+@media (max-width: 900px){{
+
+    body{{
+
+        flex-direction:column;
+    }}
+
+    .mobile-top{{
+
+        display:block;
+
+        position:sticky;
+
+        top:0;
+
+        z-index:999;
+
+        background:
+            rgba(5,5,15,.92);
+
+        backdrop-filter:blur(8px);
+
+        padding:10px;
+    }}
+
+    .side{{
+
+        position:fixed;
+
+        top:0;
+
+        left:-280px;
+
+        width:240px;
+   
+        height:100vh;
+
+        z-index:1000;
+
+        transition:.25s;
+        
+        overflow-y:auto;
+    }}
+
+    .side.show{{
+
+        left:0;
+        
+        box-shadow:
+            0 0 0 9999px rgba(0,0,0,.55);
+    }}
+
+    .main{{
+
+        padding:12px;
+    }}
+}}
+
+</style>
+
+<script>
+
+function toggleMenu(){
+
+    let s =
+        document.getElementById('sidebar');
+
+    s.classList.toggle('show');
+}
+
+function closeMenu(){
+
+    if(window.innerWidth <= 900){
+
+        document
+            .getElementById('sidebar')
+            .classList.remove('show');
+    }
+}
+
+document.addEventListener('click', function(e){
+
+    let sidebar =
+        document.getElementById('sidebar');
+
+    let button =
+        document.querySelector('.menu-btn');
+
+    if(
+
+        window.innerWidth <= 900
+
+        &&
+
+        sidebar.classList.contains('show')
+
+        &&
+
+        !sidebar.contains(e.target)
+
+        &&
+
+        !button.contains(e.target)
+
+    ){
+
+        sidebar.classList.remove('show');
+    }
+});
+
+</script>
+
+<body>
 
     {sidebar}
 
@@ -636,6 +830,8 @@ body::before {{
         {content}
 
     </div>
+
+</body>
 
     """
 # ---------- LOGIN ----------
