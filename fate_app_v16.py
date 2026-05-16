@@ -366,6 +366,10 @@ def layout(content):
     <link rel="manifest"
         href="/static/manifest.json">
    
+    <link rel="icon"
+        type="image/png"
+        href="/static/icon.png">
+   
     <link rel="apple-touch-icon"
         href="/static/icon.png">
 
