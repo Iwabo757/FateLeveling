@@ -215,8 +215,7 @@ def layout(content):
     sidebar = f"""
 
     <div class='side'>
-
-        <h2>🎮 Fate</h2>
+<h2 class='logo'>🎮 Fate</h2>
         
         {notif_html}
 
@@ -314,54 +313,181 @@ def layout(content):
 
     <style>
 
-    body {{
-        background:#0d0d14;
-        color:white;
-        font-family:Segoe UI;
-        display:flex;
-        margin:0;
-    }}
+body {
 
-    .side {{
-        width:240px;
-        background:#111827;
-        min-height:100vh;
-        padding:15px;
-    }}
+    background-image: url('/static/bg.png');
 
-    .side a {{
-        display:block;
-        padding:10px;
-        text-decoration:none;
-        color:white;
-        border-radius:8px;
-        margin-bottom:5px;
-    }}
+    background-size: cover;
 
-    .side a:hover {{
-        background:#1f2937;
-    }}
+    background-position: center;
 
-    .main {{
-        flex:1;
-        padding:20px;
-    }}
+    background-attachment: fixed;
 
-    .card {{
-        background:#1a1a2e;
-        padding:15px;
-        border-radius:12px;
-        margin-bottom:15px;
-    }}
+    background-repeat: no-repeat;
 
-    .pokemon {{
-        background:#141426;
-        padding:10px;
-        border-radius:10px;
-        margin-top:10px;
-        display:flex;
-        gap:10px;
-    }}
+    margin: 0;
+
+    color: white;
+
+    font-family: sans-serif;
+
+    display:flex;
+}
+
+body::before {
+
+    content: "";
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0,0,0,0.72);
+
+    z-index: -1;
+}
+
+.side {
+
+    width:240px;
+
+    min-height:100vh;
+
+    padding:15px;
+
+    background:
+
+        linear-gradient(
+            rgba(5,5,15,.88),
+            rgba(5,5,15,.95)
+        ),
+
+        url('/static/sidebar.png');
+
+    background-size: cover;
+
+    background-position: center;
+
+    border-right: 2px solid rgba(138,43,226,.35);
+
+    backdrop-filter: blur(6px);
+}
+
+.side a {
+
+    display:block;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    margin-bottom:8px;
+
+    background:
+        rgba(255,255,255,.03);
+
+    color:white;
+
+    text-decoration:none;
+
+    transition:.2s;
+
+    border:1px solid rgba(255,255,255,.04);
+    
+    text-align:center;
+
+    font-weight:bold;
+}
+
+.side a:hover {
+
+    background:rgba(138,43,226,.22);
+
+    transform:translateX(4px);
+}
+
+.logo {
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    text-shadow:
+        0 0 12px rgba(138,43,226,.65),
+        0 0 30px rgba(79,70,229,.45);
+
+    letter-spacing:2px;
+
+    margin-bottom:20px;
+
+    animation:
+        glow 2.5s ease-in-out infinite alternate;
+}
+
+.main {
+
+    flex:1;
+
+    padding:20px;
+
+    backdrop-filter: blur(2px);
+}
+
+.card {
+
+    background: rgba(10, 10, 25, 0.82);
+
+    backdrop-filter: blur(5px);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 0 18px rgba(138,43,226,.12);
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.pokemon {
+
+    background:
+        linear-gradient(
+            rgba(25,25,45,.95),
+            rgba(12,12,25,.95)
+        );
+
+    border:1px solid rgba(138,43,226,.18);
+
+    box-shadow:
+        0 0 12px rgba(138,43,226,.08);
+
+    padding:10px;
+
+    border-radius:14px;
+
+    margin-top:10px;
+
+    display:flex;
+
+    gap:10px;
+
+    transition:.2s;
+}
+
+.pokemon:hover {
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 18px rgba(138,43,226,.22);
+}
 
     .pokemon img {{
         width:60px;
@@ -372,13 +498,27 @@ def layout(content):
         padding:8px 12px;
         border:none;
         border-radius:8px;
-        background:#00b894;
+        background:linear-gradient(
+            135deg,
+            #7c3aed,
+            #4f46e5
+        );
         color:white;
         text-decoration:none;
         cursor:pointer;
         display:inline-block;
         margin:3px;
+        transition:.2s;
     }}
+
+.btn:hover {
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 15px rgba(0,255,200,.35);
+}
+    
 
     input,
     select,
@@ -391,12 +531,25 @@ def layout(content):
         margin-bottom:10px;
     }}
 
-    .stat {{
-        background:#141426;
-        padding:12px;
-        border-radius:10px;
-        margin-bottom:10px;
-    }}
+.stat {
+
+    background:
+        linear-gradient(
+            rgba(20,20,40,.92),
+            rgba(10,10,20,.92)
+        );
+
+    border:1px solid rgba(138,43,226,.14);
+
+    padding:14px;
+
+    border-radius:14px;
+
+    margin-bottom:12px;
+
+    box-shadow:
+        0 0 14px rgba(138,43,226,.08);
+}
 
     .userbox {{
         background:#141426;
@@ -423,17 +576,57 @@ def layout(content):
 
     animation:pulse 1.5s infinite;
 }}
-
-@keyframes pulse{{
-
-    0%{{opacity:1;}}
-
-    50%{{opacity:.5;}}
-
-    100%{{opacity:1;}}
-
-}}
   
+@keyframes pulse{
+
+    0%{opacity:1;}
+
+    50%{opacity:.5;}
+
+    100%{opacity:1;}
+}
+
+@keyframes glow {
+
+    from {
+
+        text-shadow:
+            0 0 8px rgba(138,43,226,.45),
+            0 0 18px rgba(79,70,229,.25);
+    }
+
+    to {
+
+        text-shadow:
+            0 0 18px rgba(138,43,226,.85),
+            0 0 40px rgba(79,70,229,.55);
+    }
+}
+@media (max-width: 900px){
+
+    body{
+
+        flex-direction:column;
+    }
+
+    .side{
+
+        width:100%;
+
+        min-height:auto;
+
+        border-right:none;
+
+        border-bottom:
+            2px solid rgba(138,43,226,.25);
+    }
+
+    .main{
+
+        padding:12px;
+    }
+}
+
   </style>
 
     {sidebar}
