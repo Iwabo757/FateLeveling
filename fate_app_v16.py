@@ -226,7 +226,20 @@ def layout(content):
 </div>
 
 <div class='side' id='sidebar'>
-<h2 class='logo'>🎮 Fate</h2>
+<div class='logo-wrap'>
+
+    <img src='/static/logo.gif'
+         class='logo-img'>
+
+    <div class='logo-overlay'></div>
+
+    <div class='logo-text'>
+
+         [Faté]
+
+    </div>
+
+</div>
         
         {notif_html}
 
@@ -461,22 +474,79 @@ body::before {{
     transform:translateX(4px);
 }}
 
-.logo {{
+.logo-wrap{{
 
-    font-size:32px;
+    position:relative;
 
-    font-weight:bold;
+    width:180px;
+
+    height:180px;
+
+    margin:0 auto 20px auto;
+
+    overflow:hidden;
+
+    border-radius:22px;
+
+    box-shadow:
+        0 0 30px rgba(138,43,226,.28);
+}}
+
+.logo-img{{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    filter:
+        brightness(.55)
+        contrast(1.15)
+        saturate(.9);
+}}
+
+.logo-overlay{{
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        radial-gradient(
+            rgba(138,43,226,.15),
+            rgba(0,0,0,.45)
+        );
+}}
+
+.logo-text{{
+
+    position:absolute;
+
+    top:50%;
+
+    left:50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    font-size:42px;
+
+    font-weight:900;
+
+    letter-spacing:6px;
+
+    color:white;
 
     text-shadow:
-        0 0 12px rgba(138,43,226,.65),
-        0 0 30px rgba(79,70,229,.45);
-
-    letter-spacing:2px;
-
-    margin-bottom:20px;
+        0 0 12px rgba(138,43,226,.95),
+        0 0 28px rgba(79,70,229,.65),
+        0 0 60px rgba(138,43,226,.45);
 
     animation:
         glow 2.5s ease-in-out infinite alternate;
+
+    pointer-events:none;
 }}
 
 .main {{
@@ -740,23 +810,25 @@ body::before {{
 
         top:0;
 
-        left:-280px;
+        left:0;
+
+        transform:translateX(-280px);
 
         width:240px;
-   
+
         height:100vh;
 
         z-index:1000;
 
-        transition:.25s;
-        
+        transition:transform .25s ease;
+
         overflow-y:auto;
     }}
 
     .side.show{{
 
-        left:0;
-        
+        transform:translateX(0);
+
         box-shadow:
             0 0 0 9999px rgba(0,0,0,.55);
     }}
