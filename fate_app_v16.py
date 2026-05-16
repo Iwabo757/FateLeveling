@@ -85,6 +85,10 @@ app.secret_key = "fate_secret_key"
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "request_order"
+@login_manager.unauthorized_handler
+def unauthorized():
+
+    return redirect('/request-order')
 
 # ---------- PATH ----------
 if getattr(sys, 'frozen', False):
