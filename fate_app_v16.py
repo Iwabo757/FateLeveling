@@ -586,7 +586,7 @@ body::before {{
     100%{{opacity:1;}}
 }}
 
-@keyframes glow {
+@keyframes glow {{
 
     from {{
 
@@ -601,7 +601,7 @@ body::before {{
             0 0 18px rgba(138,43,226,.85),
             0 0 40px rgba(79,70,229,.55);
     }}
-}
+}}
 @media (max-width: 900px){{
 
     body{{
